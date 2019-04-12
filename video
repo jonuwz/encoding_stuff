@@ -1,0 +1,20 @@
+### Crop detection
+
+ffmpeg -ss 1000 -i <input filename> -vframes 100 -vf cropdetect -f null -
+
+outputs : crop=1920:800:0:140
+
+then you can add the option to the final encode : 
+
+-filter:v "crop=1920:800:0:140"
+
+### x265
+
+> fast encodes enable SAO to reduce noise in the image. This looks terrible when comparing source and encoded frames
+
+ffmpeg  -i <input> -map 0:v:0 -map 0:a:0 -map 0:s:0 \
+  -pix_fmt yuv420p10le -c:v libx265 -preset slow \
+  -x265-params "crf=21:aq-mode=3:sao=0:level-idc=41:high-tier=0" \
+  -filter:v "crop=1920:800:0:140" \
+  -c:a ac3 -ac 6 -b:a 640k \
+  -c:s copy output file
